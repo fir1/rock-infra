@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forgerock-deployment
+  labels:
+    app: forgerock
+  namespace: forgerock 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forgerock
+  template:
+    metadata:
+      labels:
+        app: forgerock
+    spec:
+      containers:
+        - name: forgerock
+          imagePullPolicy: "Always"
+          image: 2112fir/forgerock:latest
+          ports:
+            - containerPort: 8080       
+          env:
+            - name: SYMBOL
+              valueFrom:
+                configMapKeyRef:
+                  name: forgerock-configmap           # The ConfigMap this value comes from.
+                  key: SYMBOL # The key to fetch.
+
+            - name: NDAYS
+              valueFrom:
+                configMapKeyRef:
+                  name: forgerock-configmap           # The ConfigMap this value comes from.
+                  key: NDAYS # The key to fetch.
+
+            - name: ALPHA_VANTAGE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: forgerock-secret
+                  key: apikey
+        
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+          
+          resources:
+            requests:
+              memory: "96Mi"
+              cpu: "300m"
+            limits:
+              memory: "192Mi"
+              cpu: "300m"      

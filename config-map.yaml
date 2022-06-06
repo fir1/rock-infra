@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forgerock-configmap
+  namespace: forgerock 
+data:
+  SYMBOL: "MSFT"
+  NDAYS: "7"
